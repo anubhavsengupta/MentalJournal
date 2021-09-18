@@ -1,7 +1,10 @@
+from os import name
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import text, create_engine
 from secrets import token_urlsafe
+
+name = None
 
 app = Flask(__name__)
 engine = create_engine('sqlite+pysqlite:///database.db')
@@ -15,6 +18,8 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+	global name
+
 	if request.method == 'POST':
 		username = request.form.get('username')
 		password = request.form.get('password')
@@ -30,8 +35,10 @@ def login():
 				flash('Incorrect Username or Password')
 				return redirect('/login')
 
+			name = credentials[0]['username']
+			print(name)
 			session['user_id'] = credentials[0]['id']
-			return redirect('/')
+			return redirect('/home')
 
 	elif request.method == 'GET':
 		return render_template('login.html')
@@ -43,7 +50,7 @@ def register():
 		password = request.form.get('password')
 
 		if not username or not password:
-			flash('Please enter required fields')
+			flash('Please Fillout All Required Fields')
 			return redirect('/register')
 		
 		with engine.connect() as conn:
@@ -60,6 +67,18 @@ def register():
 
 	elif request.method == 'GET':
 		return render_template('register.html')
+
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+	global name
+	if not 'user_id' in session:
+		flash('Login First')
+		return redirect('/login')
+	if request.method == 'POST':
+		pass
+
+	elif request.method == 'GET':
+		return render_template('homepage.html', name=name)
 
 if __name__ == '__main__':
 	app.run(debug=True)
