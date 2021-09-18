@@ -16,10 +16,22 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if request.method == 'POST':
-		flash('hello')
-		#username = request.form.get('username')
-		#password = request.form.get('password')
-		return 'hello'
+		username = request.form.get('username')
+		password = request.form.get('password')
+
+		if not username or not password:
+			flash('Pleaase Fillout All Required Fields')
+			return redirect('/login')
+		
+		with engine.connect() as conn:
+			
+			credentials = conn.execute('SELECT * FROM users WHERE username = :username', {'username': username}).mappings().all()
+			if not credentials or not check_password_hash(credentials[0]['hash'], password):
+				flash('Incorrect Username or Password')
+				return redirect('/login')
+
+			session['user_id'] = credentials[0]['id']
+			return redirect('/')
 
 	elif request.method == 'GET':
 		return render_template('login.html')

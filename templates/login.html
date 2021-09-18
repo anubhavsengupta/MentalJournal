@@ -5,6 +5,11 @@
 {% endblock %}
 
 {% block body %}
+{% for mesg in get_flashed_messages() %}
+<div class="alert alert-danger" role="alert">
+    {{ mesg  }}
+</div>
+{% endfor %}
     <form action='/login' method='POST'>
         <div>
             <input style='width: 325px; position: relative; left: 35px; top: 50px;' type='text' name='username' class="form-control" autocomplete='off' autofocus placeholder='Username'>
