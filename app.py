@@ -30,12 +30,24 @@ def register():
 		username = request.form.get('username')
 		password = request.form.get('password')
 
+		if not username or not password:
+			flash('Please enter required fields')
+			return redirect('/register')
+		
+		with engine.connect() as conn:
+
+			if len(conn.execute('SELECT * FROM users WHERE username = :username', {'username': username}).mappings().all()) != 0:
+				flash('Username taken')
+				return redirect('/register')
+
+			conn.execute(
+				'INSERT INTO users (username, hash) VALUES (:username, :hash)', {'username': username, 'hash': generate_password_hash(password)}
+			)
+
+		return redirect('/login')
+
 	elif request.method == 'GET':
 		return render_template('register.html')
-
-@app.route("/register")
-def register():
-	return render_template("register.html")
 
 if __name__ == '__main__':
 	app.run(debug=True)

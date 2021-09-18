@@ -5,13 +5,18 @@
 {% endblock %}
 
 {% block body %}
-    <form action="#" method="POST">
-        <input type="email" name="email" placeholder="Enter email">
-        <br>
-        <input type="password" name="password" placeholder="Enter Password">
-        <br>
-        <input type="password" name="password" placeholder="Confirm Password">
-        <br>
-        <input type="submit" value="submit">
-    </form>
+{% for mesg in get_flashed_messages() %}
+    <div class="alert alert-danger" role="alert">
+        {{ mesg  }}
+    </div>
+{% endfor %}
+<form action='/register' method='POST'>
+    <div>
+        <input style='width: 325px; position: relative; left: 35px; top: 50px;' type='text' name='username' class="form-control" autocomplete='off' autofocus placeholder='Username'>
+    </div>
+    <div>
+        <input style='width: 325px; position: relative; left: 37.5px; top: 75px;' type='password' name='password' class='form-control' autocomplete='off' placeholder='Password'>
+    </div>
+    <button class='btn btn-primary' style='text-align: center; position: relative; top: 145px;'>Register</button>
+</form>
 {% endblock %}
