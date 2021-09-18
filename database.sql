@@ -1,0 +1,1 @@
+CREATE table users(id INTEGER, username TEXT, hash TEXT, PRIMARY KEY(id));
