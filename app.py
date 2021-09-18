@@ -10,7 +10,7 @@ app.secret_key = token_urlsafe()
 
 @app.route('/')
 def index():
-	return render_template('index.html')
+	return redirect('login')
 	
 
 @app.route('/login', methods=['GET', 'POST'])
