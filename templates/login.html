@@ -4,11 +4,14 @@
     <title>Home Page</title>
 {% endblock %}
 
-{% block content %}
-    <form action="#" method="post">
-    <p>Name: </p>
-    <p><input type="text" name="nameinput"/></p>
-    <p><input type="submit" value="submit"/></p>
-
+{% block body %}
+    <form action='/login' method='POST'>
+        <div>
+            <input style='width: 325px; position: relative; left: 35px; top: 50px;' type='text' name='username' class="form-control" autocomplete='off' autofocus placeholder='Username'>
+        </div>
+        <div>
+            <input style='width: 325px; position: relative; left: 37.5px; top: 75px;' type='password' name='password' class='form-control' autocomplete='off' placeholder='Password'>
+        </div>
+        <button class='btn btn-primary' style='text-align: center; position: relative; top: 145px;'>Register</button>
     </form>
 {% endblock %}
