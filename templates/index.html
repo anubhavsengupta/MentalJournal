@@ -1,7 +1,9 @@
-{% extends "index.html" %}
+{% extends "template.html" %}
 
-{% block title %} Home Page {% endblock %}
-<!-- code will be rendered into the base.html template-->
-    {% block content %}
-        <h2>Testing 0213</h2>
-    {% endblock %}
+{% block head %}
+    <title>Home Page</title>
+{% endblock %}
+
+{% block body %}
+    Homepage test
+{% endblock %}

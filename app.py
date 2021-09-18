@@ -1,7 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 import secrets
 from datetime import timedelta
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import engine
 
 app = Flask(__name__)
 
