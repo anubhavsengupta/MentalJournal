@@ -80,9 +80,18 @@ def home():
 
 	elif request.method == 'GET':
 		with engine.connect() as conn:
-			day = conn.execute('SELECT day FROM journal WHERE user_id = :user_id', {'user_id': session['user_id']}).mappings().all()
-			mental_mood = [5, 7, 1, 2, 9, 10, 7, 5, 7, 8, 9, 10]
-			return render_template('homepage.html', name=name, x=day, y=mental_mood)
+			journal = conn.execute('SELECT * FROM journal WHERE user_id = :user_id', {'user_id': session['user_id']}).mappings().all()
+			if not journal:
+				flash('Make an Entry First')
+				return redirect('/journal')
+			x_label = list()
+			y_label = list()
+			for value in journal:
+				print(value)
+				x_label.append(value['number'])
+				y_label.append(value['mood'])
+
+			return render_template('homepage.html', name=name, x=x_label, y=y_label)
 
 @app.route('/journal', methods=['GET', 'POST'])
 def journal():
