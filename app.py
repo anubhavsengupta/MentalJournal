@@ -1,5 +1,4 @@
-from os import name
-from flask import Flask, redirect, url_for, render_template, request, session, flash
+from flask import Flask, redirect, render_template, request, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import text, create_engine
 from secrets import token_urlsafe
@@ -19,6 +18,9 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	global name
+
+	if 'user_id' in session:
+		return redirect['/home']
 
 	if request.method == 'POST':
 		username = request.form.get('username')
@@ -45,6 +47,10 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+	
+	if 'user_id' in session:
+		return redirect['/home']
+
 	if request.method == 'POST':
 		username = request.form.get('username')
 		password = request.form.get('password')
@@ -71,6 +77,7 @@ def register():
 @app.route('/home', methods=['GET', 'POST'])
 def home():
 	global name
+
 	if not 'user_id' in session:
 		flash('Login First')
 		return redirect('/login')
@@ -86,12 +93,13 @@ def home():
 				return redirect('/journal')
 			x_label = list()
 			y_label = list()
+			label = list()
 			for value in journal:
-				print(value)
 				x_label.append(value['number'])
 				y_label.append(value['mood'])
+				label.append(value['journal'])
 
-			return render_template('homepage.html', name=name, x=x_label, y=y_label)
+			return render_template('homepage.html', name=name, x=x_label, y=y_label, label=label)
 
 @app.route('/journal', methods=['GET', 'POST'])
 def journal():
@@ -112,17 +120,20 @@ def journal():
 						continue
 					conn.execute(f'UPDATE journal SET number = {i - 1} WHERE user_id = :user_id AND number = {i}', {'user_id': session['user_id']})
 			num = conn.execute('SELECT MAX(number) FROM journal WHERE user_id = :user_id', {'user_id': session['user_id']}).mappings().all()[0]['MAX(number)']
-			print(num)
 			if not num:
 				num = 1
 			else:
 				num = int(num) + 1
-			print(num)
 			conn.execute('INSERT INTO journal(user_id, mood, journal, number) VALUES (:user_id, :mood, :journal, :number)', {'user_id': session['user_id'], 'mood': mood, 'journal': journal, 'number': num})
 		return redirect('/journal')
 
 	elif request.method == 'GET':
 		return render_template('journal.html')
+
+@app.route('/logout')
+def logout():
+	session['user_id'] = None
+	return redirect('/login')
 
 if __name__ == '__main__':
 	app.run(debug=True)
