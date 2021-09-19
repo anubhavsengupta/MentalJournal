@@ -74,11 +74,46 @@ def home():
 	if not 'user_id' in session:
 		flash('Login First')
 		return redirect('/login')
+
 	if request.method == 'POST':
 		pass
 
 	elif request.method == 'GET':
-		return render_template('homepage.html', name=name)
+		with engine.connect() as conn:
+			day = conn.execute('SELECT day FROM journal WHERE user_id = :user_id', {'user_id': session['user_id']}).mappings().all()
+			mental_mood = [5, 7, 1, 2, 9, 10, 7, 5, 7, 8, 9, 10]
+			return render_template('homepage.html', name=name, x=day, y=mental_mood)
+
+@app.route('/journal', methods=['GET', 'POST'])
+def journal():
+	if not 'user_id' in session:
+		flash('Login First')
+		return redirect('/login')
+	
+	if request.method == 'POST':
+		journal = request.form.get('journal_write')
+		mood = request.form.get('mood_number')
+		print(mood, journal)
+		with engine.connect() as conn:
+			entries = conn.execute('SELECT * FROM journal WHERE user_id = :user_id', {'user_id': session['user_id']}).mappings().all()
+			if len(entries) >= 10:
+				for i in range(1, 11):
+					if i == 1:
+						conn.execute('DELETE FROM journal WHERE user_id = :user_id AND number = 1', {'user_id': session['user_id']})
+						continue
+					conn.execute(f'UPDATE journal SET number = {i - 1} WHERE user_id = :user_id AND number = {i}', {'user_id': session['user_id']})
+			num = conn.execute('SELECT MAX(number) FROM journal WHERE user_id = :user_id', {'user_id': session['user_id']}).mappings().all()[0]['MAX(number)']
+			print(num)
+			if not num:
+				num = 1
+			else:
+				num = int(num) + 1
+			print(num)
+			conn.execute('INSERT INTO journal(user_id, mood, journal, number) VALUES (:user_id, :mood, :journal, :number)', {'user_id': session['user_id'], 'mood': mood, 'journal': journal, 'number': num})
+		return redirect('/journal')
+
+	elif request.method == 'GET':
+		return render_template('journal.html')
 
 if __name__ == '__main__':
 	app.run(debug=True)

@@ -1,1 +1,2 @@
-CREATE table users(id INTEGER, username TEXT, hash TEXT, PRIMARY KEY(id));
+CREATE table users (id INTEGER, username TEXT, hash TEXT, PRIMARY KEY(id));
+CREATE table journal (user_id INTEGER, mood INTEGER, journal TEXT, number INTEGER, FOREIGN KEY (user_id) REFERENCES users(id));
